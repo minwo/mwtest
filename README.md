@@ -8,3 +8,6 @@ https://eyabc.github.io/Doc/dev/core-javascript/%EA%B0%9D%EC%B2%B4%20%EA%B8%B0%E
 
 리엑트 게시판 연습
 https://onethejay.tistory.com/193
+
+클로저 호이스팅
+https://velog.io/@hyumapr/JavaScript-Sean103024
