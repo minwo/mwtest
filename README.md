@@ -11,3 +11,6 @@ https://onethejay.tistory.com/193
 
 클로저 호이스팅
 https://velog.io/@hyumapr/JavaScript-Sean103024
+
+몽고디비 연결
+https://super-ruby.tistory.com/17
