@@ -15,3 +15,6 @@ https://velog.io/@hyumapr/JavaScript-Sean103024
 몽고디비 연결
 https://super-ruby.tistory.com/17
 https://velog.io/@wns450/API-%EB%9D%BC%EC%9A%B0%ED%8A%B8-%EB%A7%8C%EB%93%A4%EC%96%B4%EB%B3%B4%EA%B8%B0
+
+퍼블리싱 가이드
+http://mjae.me/
