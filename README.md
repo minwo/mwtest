@@ -19,3 +19,6 @@ https://velog.io/@wns450/API-%EB%9D%BC%EC%9A%B0%ED%8A%B8-%EB%A7%8C%EB%93%A4%EC%9
 퍼블리싱 가이드
 http://mjae.me/
 http://www.standard-ui.com/Home/index.html
+
+사업자 관련 링크
+https://www.ridge.kr/board/view/qna/81
