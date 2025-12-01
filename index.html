@@ -3,75 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS Calendar (Tailwind Fixed)</title>
+    <title>JS Calendar (Formatted)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <style type="text/tailwindcss">
-        /* 1. 기본 셀 스타일 */
-        td.is-in-range { @apply bg-blue-100; }
+    <style>
+        /* --- CSS 스타일 --- */
         
-        /* 2. 날짜 버튼 스타일 */
-        .day-btn {
-            @apply w-9 h-9 flex items-center justify-center rounded-full mx-auto transition-colors duration-150 relative;
-            flex-direction: column; line-height: 1; padding-top: 4px; cursor: pointer;
+        /* 1. 캘린더 레이아웃 */
+        .calendar-header { 
+            @apply flex items-center justify-between mb-4 p-2; 
         }
-        .day-btn:focus-visible { @apply ring-2 ring-offset-2 ring-blue-500 outline-none z-10; }
+        .month-title { 
+            @apply text-lg font-bold text-center; 
+        }
+        .nav-btn { 
+            @apply p-2 text-xl font-bold text-gray-700 disabled:opacity-30 hover:bg-gray-100 rounded-full transition-colors; 
+        }
+        
+        /* 2. 그리드 & 테이블 */
+        .month-grid { @apply mb-6; }
+        .month-grid h3 { @apply mb-4 text-base font-semibold text-center; }
+        table { @apply w-full text-center border-collapse; }
+        th { @apply pb-2 font-normal text-gray-500 text-sm; }
+        th.is-sun { @apply text-red-500; }
+
+        /* 3. 날짜 버튼 */
+        .day-btn {
+            @apply w-9 h-9 flex items-center justify-center rounded-full mx-auto relative transition-all duration-200 text-sm;
+            flex-direction: column; 
+            line-height: 1; 
+            padding-top: 4px; 
+            cursor: pointer;
+        }
         .day-btn:not(:disabled):hover { @apply bg-gray-100; }
-        
-        /* 상태별 색상 */
+        .day-btn:focus-visible { @apply ring-2 ring-offset-2 ring-blue-500 outline-none z-10; }
+
+        /* 4. 상태별 스타일 */
         .day-btn.is-sun { @apply text-red-500; }
-        .day-btn.is-today { @apply border border-gray-400; }
+        .day-btn.is-today { @apply border border-gray-400 font-bold; }
         
-        /* 비활성화 스타일 */
+        /* 비활성화 */
         .day-btn:disabled, 
         td.is-disabled .day-btn { 
             @apply text-gray-300 cursor-not-allowed line-through opacity-50; 
             pointer-events: none; 
         }
         
-        /* 선택된 날짜 스타일 */
+        /* 선택된 날짜 */
         td.is-start-date .day-btn,
         td.is-end-date .day-btn,
         td.is-single-date .day-btn { 
-            @apply bg-blue-600 text-white font-semibold;
+            @apply bg-blue-600 text-white font-bold shadow-md;
             opacity: 1 !important;
         }
 
-        /* 둥근 모서리 */
-        td.is-range-start { @apply rounded-l-lg; }
-        td.is-range-end { @apply rounded-r-lg; }
+        /* 범위 배경 */
+        td.is-in-range { @apply bg-blue-50; }
+        td.is-range-start { @apply rounded-l-2xl; }
+        td.is-range-end { @apply rounded-r-2xl; }
 
-        /* '오늘' 레이블 */
-        .today-label { 
-            position: absolute; bottom: 2px; font-size: 0.5rem; font-weight: 500; color: inherit; 
-        }
+        /* 월 경계 마커 */
+        td.range-end-marker { background: linear-gradient(to right, #eff6ff 50%, transparent 50%); }
+        td.range-start-marker { background: linear-gradient(to left, #eff6ff 50%, transparent 50%); }
+
+        /* 오늘 레이블 */
+        .today-label { position: absolute; bottom: 2px; font-size: 10px; font-weight: 500; color: inherit; }
         td.is-start-date .today-label, td.is-end-date .today-label, td.is-single-date .today-label { color: white; }
-
-        /* 월 경계 마커 (그라데이션) */
-        td.range-end-marker { background: linear-gradient(to right, #dbeafe 50%, transparent 50%); }
-        td.range-start-marker { background: linear-gradient(to left, #dbeafe 50%, transparent 50%); }
 
         /* 애니메이션 */
         .calendar-slider { transition: transform 0.3s ease-in-out; }
-
-        /* [예제용] 커스텀 뱃지 스타일 */
-        .price-badge { position: absolute; top: -2px; right: -2px; width: 6px; height: 6px; background: #ef4444; border-radius: 50%; }
+        .month-container { min-width: 100%; }
     </style>
 </head>
-<body class="p-10 bg-gray-100">
+<body class="p-10 bg-gray-50">
 
     <div class="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg">
-        <h2 class="text-xl font-bold mb-4">테일윈드 적용 확인</h2>
+        <h2 class="text-xl font-bold mb-6 text-gray-800">Formatted Code Version</h2>
         
-        <div class="p-4 border border-gray-300 rounded bg-white mb-4">
-            <div class="flex space-x-2">
+        <div class="p-4 border border-gray-200 rounded-lg bg-gray-50 mb-6">
+            <div class="flex space-x-4">
                 <div class="w-1/2">
-                    <label class="block text-xs text-gray-500 mb-1">시작일</label>
-                    <input id="start-date-input" class="w-full border p-2 rounded text-center font-medium" value="2025-11-28" />
+                    <label class="block text-xs font-bold text-gray-500 mb-1">시작일</label>
+                    <input id="start-date-input" class="w-full border p-2 rounded text-center font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" value="2025.11.29" />
                 </div>
                 <div class="w-1/2">
-                    <label class="block text-xs text-gray-500 mb-1">종료일</label>
-                    <input id="end-date-input" class="w-full border p-2 rounded text-center font-medium" value="2026-08-05" /> 
+                    <label class="block text-xs font-bold text-gray-500 mb-1">종료일</label>
+                    <input id="end-date-input" class="w-full border p-2 rounded text-center font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" value="2025-12-05" /> 
                 </div>
             </div>
         </div>
@@ -81,57 +98,102 @@
 
 <script>
     // ============================================
-    //  ⬇️ CalendarLib Core ⬇️
+    //  ⬇️ CalendarLib Core (Formatted) ⬇️
     // ============================================
 
     function CalendarLib(element, options) {
-        if (!element) { console.error("CalendarLib: Error"); return; }
+        if (!element) {
+            console.error("CalendarLib: Error - Element not found");
+            return;
+        }
+        
         this.element = element;
         options = options || {};
+        
+        var defaultDayNames = ['일', '월', '화', '수', '목', '금', '토'];
+        var defaultMonthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
         this.options = {
             numberOfMonths: options.numberOfMonths, 
             selectionMode: options.selectionMode || 'RANGE',
-            startDateSelector: options.startDateSelector || null, endDateSelector: options.endDateSelector || null, 
+            startDateSelector: options.startDateSelector || null, 
+            endDateSelector: options.endDateSelector || null, 
+            
+            // Format & Labels
             format: options.format || 'YYYY.MM.DD(ddd)', 
-            defaultStartLabel: options.defaultStartLabel || '가는날', defaultEndLabel: options.defaultEndLabel || '오는날',
-            swipeNavigation: options.swipeNavigation || false, rangeClass: options.rangeClass || null,
-            disable: options.disable || [], enable: options.enable || [],
-            startDate: options.startDate || null, endDate: options.endDate || null,
+            defaultStartLabel: options.defaultStartLabel || '가는날', 
+            defaultEndLabel: options.defaultEndLabel || '오는날',
+            dayNames: options.dayNames || defaultDayNames,
+            monthNames: options.monthNames || defaultMonthNames, 
+            monthHeaderFormat: options.monthHeaderFormat || 'YYYY년 M월',
+
+            // Features
+            swipeNavigation: options.swipeNavigation || false, 
+            rangeClass: options.rangeClass || null,
+            
+            // Restrictions
+            disable: options.disable || [], 
+            enable: options.enable || [],
             selectableDays: options.selectableDays || null, 
             minDate: options.minDate !== undefined ? options.minDate : 'today', 
             maxDate: options.maxDate || null,
-            // Events
-            onSelect: options.onSelect || null, onInvalid: options.onInvalid || null, onMonthChange: options.onMonthChange || null, onRenderCell: options.onRenderCell || null
+            
+            // Initial Values
+            startDate: options.startDate || null, 
+            endDate: options.endDate || null,
+
+            // Callbacks
+            onSelect: options.onSelect || null, 
+            onInvalid: options.onInvalid || null, 
+            onMonthChange: options.onMonthChange || null, 
+            onRenderCell: options.onRenderCell || null
         };
+        
         this.els = {
             startInput: this.options.startDateSelector ? document.querySelector(this.options.startDateSelector) : null,
             endInput: (this.options.selectionMode === 'RANGE' && this.options.endDateSelector) ? document.querySelector(this.options.endDateSelector) : null
         };
-        this.isSingleMode = (this.options.selectionMode === 'SINGLE');
-        this.startDate = null; this.endDate = null;
-        this.today = new Date(); this.today.setHours(0, 0, 0, 0);
-        this.minLimit = null; this.maxLimit = null;
         
-        // 캐싱 변수
-        this.monthData = []; this.currentMonthIndex = 0; 
-        this.allDayBtns = []; this.cachedMarkerTds = [];
+        this.isSingleMode = (this.options.selectionMode === 'SINGLE');
+        this.startDate = null; 
+        this.endDate = null;
+        this.today = new Date(); 
+        this.today.setHours(0, 0, 0, 0);
+        this.minLimit = null; 
+        this.maxLimit = null;
+        
+        this.allDayBtns = []; 
+        this.cachedMarkerTds = [];
+        this.monthData = []; 
+        this.currentMonthIndex = 0; 
         this.isEventBound = false;
 
         this.init();
     }
 
+    /**
+     * 초기화 함수
+     */
     CalendarLib.prototype.init = function() {
-        // 1. 초기 날짜 값 파싱 (옵션 -> 인풋 순서)
         var initialStartISO = this.options.startDate || null; 
         var initialEndISO = (!this.isSingleMode && this.options.endDate) ? this.options.endDate : null;
         
-        if (!initialStartISO && this.els.startInput) { initialStartISO = this._parseDisplayDate(this.els.startInput.value); }
-        if (!initialEndISO && this.els.endInput) { initialEndISO = this._parseDisplayDate(this.els.endInput.value); }
+        // Input에서 값 읽어오기
+        if (!initialStartISO && this.els.startInput) { 
+            initialStartISO = this._parseDisplayDate(this.els.startInput.value); 
+        }
+        if (!initialEndISO && this.els.endInput) { 
+            initialEndISO = this._parseDisplayDate(this.els.endInput.value); 
+        }
 
-        // 2. Min/Max Limit 설정
-        if (this.options.minDate === 'today') { this.minLimit = new Date(this.today.getTime()); } 
-        else if (this.options.minDate) { this.minLimit = this._parseDate(this._parseDisplayDate(this.options.minDate)); } 
-        else { this.minLimit = null; }
+        // Min/Max Limit 설정
+        if (this.options.minDate === 'today') { 
+            this.minLimit = new Date(this.today.getTime()); 
+        } else if (this.options.minDate) { 
+            this.minLimit = this._parseDate(this._parseDisplayDate(this.options.minDate)); 
+        } else { 
+            this.minLimit = null; 
+        }
 
         if (typeof this.options.selectableDays === 'number' && this.options.selectableDays > 0) {
             var baseDate = this.minLimit ? new Date(this.minLimit.getTime()) : new Date(this.today.getTime());
@@ -144,13 +206,13 @@
         if (this.minLimit) this.minLimit.setHours(0,0,0,0);
         if (this.maxLimit) this.maxLimit.setHours(0,0,0,0);
 
-        // 3. 렌더링 기준일 및 개월 수 자동 계산
+        // 렌더링 기준일 및 기간 계산
         var startObj = initialStartISO ? this._parseDate(initialStartISO) : null;
-        // 기준일: 입력된 시작일 > MinDate > 오늘
         var renderBaseDate = startObj ? new Date(startObj.getTime()) : (this.minLimit ? new Date(this.minLimit.getTime()) : new Date(this.today.getTime()));
-        // 만약 minLimit이 있고 기준일이 그보다 전이라면 (입력값이 없다는 전제하에) minLimit 사용
-        // 단, 입력값(startObj)이 있는 경우 과거라도 보여줘야 하므로 보정하지 않음 (선택사항)
-        if (!startObj && this.minLimit && renderBaseDate < this.minLimit) renderBaseDate = new Date(this.minLimit.getTime());
+        
+        if (this.minLimit && renderBaseDate < this.minLimit) {
+            renderBaseDate = new Date(this.minLimit.getTime());
+        }
 
         var startYear = renderBaseDate.getFullYear();
         var startMonth = renderBaseDate.getMonth() + 1;
@@ -168,7 +230,7 @@
             this.options.numberOfMonths = neededMonths;
         }
 
-        // 4. UI 생성
+        // UI 생성
         this.element.innerHTML = '';
         if (this.options.swipeNavigation) { 
             this._buildSwipeStructure(startYear, startMonth); 
@@ -177,28 +239,40 @@
             this._buildScrollStructure(startYear, startMonth); 
         }
 
-        // 5. DOM 요소 캐싱
+        // DOM 캐싱
         this.allDayBtns = this.element.querySelectorAll('.day-btn');
         this.cachedMarkerTds = this.element.querySelectorAll('[data-marker-type]');
 
-        // 6. 이벤트 바인딩 (최초 1회)
+        // 이벤트 바인딩 (최초 1회)
         if (!this.isEventBound) {
             this.element.addEventListener('click', this._handleDayClick.bind(this));
             this.isEventBound = true;
         }
         
+        // 초기 선택값 세팅
         this.setRange(initialStartISO, initialEndISO);
         
-        // onRenderCell 트리거
-        if (this.options.onRenderCell) {
-            for(var i=0; i<this.allDayBtns.length; i++) {
+        // 렌더링 후 콜백
+        this._triggerRenderCell();
+    };
+
+    /**
+     * onRenderCell 콜백 실행기
+     */
+    CalendarLib.prototype._triggerRenderCell = function() {
+        if (typeof this.options.onRenderCell === 'function') {
+            for (var i = 0; i < this.allDayBtns.length; i++) {
                 var btn = this.allDayBtns[i];
-                this.options.onRenderCell(this._parseDate(btn.dataset.date), btn.parentNode);
+                var d = this._parseDate(btn.dataset.date);
+                var cell = btn.parentNode;
+                this.options.onRenderCell(d, cell);
             }
         }
     };
 
-    // [유효성 검사]
+    /**
+     * 날짜 비활성화 체크
+     */
     CalendarLib.prototype._isDateDisabled = function(dateObj, dateStr) {
         if (this.minLimit && dateObj.getTime() < this.minLimit.getTime()) return true;
         if (this.maxLimit && dateObj.getTime() > this.maxLimit.getTime()) return true;
@@ -207,141 +281,121 @@
         return false;
     };
 
-    // [HTML 생성]
-    CalendarLib.prototype._generateCalendarHTML = function(year, month) {
-        var monthIndex = month - 1; var firstDay = new Date(year, monthIndex, 1);
-        var daysInMonth = new Date(year, month, 0).getDate();
-        var startDayOfWeek = firstDay.getDay(); 
-        
-        var html = '<div class="month-grid">' + 
-            '<h3 class="mb-2 text-base font-semibold text-center" id="month-'+year+'-'+month+'">' + year + '년 ' + month + '월</h3>' +
-            '<table class="w-full text-center table-auto border-collapse" role="grid" aria-labelledby="month-'+year+'-'+month+'">' +
-                '<thead><tr class="text-sm text-gray-500">' + 
-                '<th scope="col" class="pb-2 font-normal text-red-500">일</th><th scope="col" class="pb-2 font-normal">월</th>' +
-                '<th scope="col" class="pb-2 font-normal">화</th><th scope="col" class="pb-2 font-normal">수</th><th scope="col" class="pb-2 font-normal">목</th><th scope="col" class="pb-2 font-normal">금</th><th scope="col" class="pb-2 font-normal">토</th>' +
-                '</tr></thead>' + '<tbody>';
-        var dayCounter = 1; var paddingStarted = false;
-        
-        // 마커용 기준 날짜
-        var firstDayOfCurrentMonth = new Date(year, monthIndex, 1); firstDayOfCurrentMonth.setHours(0,0,0,0);
-        var lastDayOfCurrentMonth = new Date(year, monthIndex, daysInMonth); lastDayOfCurrentMonth.setHours(0,0,0,0);
-        var firstDayISO = this._dateToISO(firstDayOfCurrentMonth);
-        var lastDayISO = this._dateToISO(lastDayOfCurrentMonth);
-        var dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-
-        for (var i = 0; i < 6; i++) {
-            html += '<tr>';
-            for (var j = 0; j < 7; j++) {
-                var tdClasses = ''; var classes = 'day-btn'; var extraLabel = ''; var ariaLabel = '';
-                var markerAttr = '';
-
-                if (i === 0 && j < startDayOfWeek) { 
-                    // [이전 달 패딩] 마커 데이터 심기
-                    if (j === startDayOfWeek - 1) { markerAttr = 'data-marker-type="prev" data-ref-date="' + firstDayISO + '"'; }
-                    html += '<td class="' + tdClasses + '" ' + markerAttr + '><span aria-hidden="true"></span></td>'; continue;
-                } else if (dayCounter > daysInMonth) {
-                    // [다음 달 패딩] 마커 데이터 심기
-                    if (!paddingStarted) { markerAttr = 'data-marker-type="next" data-ref-date="' + lastDayISO + '"'; paddingStarted = true; }
-                    html += '<td class="' + tdClasses + '" ' + markerAttr + '><span aria-hidden="true"></span></td>'; dayCounter++; continue;
-                } else {
-                    var dateObj = new Date(year, monthIndex, dayCounter); dateObj.setHours(0,0,0,0);
-                    var fullDateStr = this._dateToISO(dateObj);
-                    ariaLabel = year + '년 ' + month + '월 ' + dayCounter + '일 ' + dayNames[j];
-
-                    if (j === 0) classes += ' is-sun';
-                    if (dateObj.getTime() === this.today.getTime()) { 
-                        classes += ' is-today'; extraLabel = '<span class="today-label" aria-hidden="true">오늘</span>'; ariaLabel += ', 오늘';
-                    }
-                    
-                    // [비활성화 적용]
-                    var isDisabled = this._isDateDisabled(dateObj, fullDateStr);
-                    var disabledAttr = '';
-                    if (isDisabled) {
-                        tdClasses += ' is-disabled'; classes += ' is-disabled';
-                        disabledAttr = 'disabled aria-disabled="true"';
-                    }
-                    
-                    html += '<td class="' + tdClasses + '"><button type="button" class="' + classes + '" data-date="' + fullDateStr + '" aria-label="' + ariaLabel + '" ' + disabledAttr + '>' + dayCounter + extraLabel + '</button></td>';
-                    dayCounter++;
-                }
-            }
-            html += '</tr>';
-            if (dayCounter > daysInMonth) break; 
-        }
-        html += '</tbody></table></div>';
-        return html;
-    };
-
+    /**
+     * 날짜 선택 (외부 호출 가능)
+     */
     CalendarLib.prototype.setRange = function(start, endOrDuration) {
         var endOr = endOrDuration !== undefined ? endOrDuration : null; 
-        this.startDate = start || null; this.endDate = null;
-        if (this.isSingleMode) {} else if (this.startDate) {
-            if (typeof endOr === 'string') { this.endDate = endOr; } 
-            else if (typeof endOr === 'number') {
-                var date = this._parseDate(this.startDate); if (date) { date.setDate(date.getDate() + endOr); this.endDate = this._dateToISO(date); }
+        this.startDate = start || null; 
+        this.endDate = null;
+
+        if (this.isSingleMode) {
+            // SINGLE 모드
+        } else if (this.startDate) {
+            // RANGE 모드
+            if (typeof endOr === 'string') { 
+                this.endDate = endOr; 
+            } else if (typeof endOr === 'number') {
+                var date = this._parseDate(this.startDate); 
+                if (date) { 
+                    date.setDate(date.getDate() + endOr); 
+                    this.endDate = this._dateToISO(date); 
+                }
             }
+            // 유효성 검사 (종료일 <= 시작일이면 무효화)
             if (this.endDate) {
-                var s = this._parseDate(this.startDate); var e = this._parseDate(this.endDate);
+                var s = this._parseDate(this.startDate); 
+                var e = this._parseDate(this.endDate);
                 s.setHours(0,0,0,0); e.setHours(0,0,0,0);
-                if (e.getTime() <= s.getTime()) { this.endDate = null; }
+                if (e.getTime() <= s.getTime()) { 
+                    this.endDate = null; 
+                }
             }
         } 
         this._updateUI();
     };
 
+    /**
+     * 날짜 클릭 이벤트 핸들러
+     */
     CalendarLib.prototype._handleDayClick = function(e) {
         var target = e.target;
         var btn = target.closest('.day-btn');
         
         if (!btn) return; 
+        
+        // 비활성 클릭 시 콜백
         if (btn.disabled) {
-             if(this.options.onInvalid) this.options.onInvalid(btn.dataset.date);
+             if(typeof this.options.onInvalid === 'function') { 
+                 this.options.onInvalid(btn.dataset.date); 
+             }
              return; 
         }
         
         var clickedDate = btn.dataset.date;
         
         if (this.isSingleMode) {
-            this.startDate = clickedDate; this.endDate = null;
+            this.startDate = clickedDate; 
+            this.endDate = null;
         } else {
             if (this.startDate && this.endDate) { 
-                this.startDate = clickedDate; this.endDate = null; 
+                this.startDate = clickedDate; 
+                this.endDate = null; 
             } else if (this.startDate && !this.endDate) {
                 var sDate = this._parseDate(this.startDate);
                 var cDate = this._parseDate(clickedDate);
                 if (cDate.getTime() <= sDate.getTime()) {
-                    this.startDate = clickedDate; this.endDate = null; 
-                } else { this.endDate = clickedDate; }
-            } else { this.startDate = clickedDate; }
+                    this.startDate = clickedDate; 
+                    this.endDate = null; 
+                } else { 
+                    this.endDate = clickedDate; 
+                }
+            } else { 
+                this.startDate = clickedDate; 
+            }
         }
+        
         this._updateUI();
-        if(this.options.onSelect) this.options.onSelect(this.getValue());
+        
+        if(typeof this.options.onSelect === 'function') { 
+            this.options.onSelect(this.getValue()); 
+        }
     };
 
-    // [핵심] DOM 파괴 없이 클래스만 토글
+    /**
+     * UI 업데이트 (DOM 파괴 없이 클래스만 변경)
+     */
     CalendarLib.prototype._updateUI = function() {
         var start = this.startDate ? this._parseDate(this.startDate) : null; 
         var end = this.endDate ? this._parseDate(this.endDate) : null; 
         var customClass = this.options.rangeClass;
         
-        // 1. 날짜 셀 업데이트
-        var allBtns = (this.allDayBtns && this.allDayBtns.length > 0) ? this.allDayBtns : this.element.querySelectorAll('.day-btn');
-        for (var i = 0; i < allBtns.length; i++) {
-            var btn = allBtns[i]; var dayDateStr = btn.dataset.date; if (!dayDateStr) continue;
-            var dayDate = this._parseDate(dayDateStr); var dayCell = btn.parentNode; 
+        // 1. 날짜 버튼 업데이트
+        for (var i = 0; i < this.allDayBtns.length; i++) {
+            var btn = this.allDayBtns[i]; 
+            var dayDateStr = btn.dataset.date; 
+            if (!dayDateStr) continue;
             
+            var dayDate = this._parseDate(dayDateStr); 
+            var dayCell = btn.parentNode; 
+            
+            // 초기화
             btn.setAttribute('aria-selected', 'false'); 
-            // *주의: is-disabled는 HTML 생성 시 고정이므로 제거 안함*
             dayCell.classList.remove('is-in-range', 'is-range-start', 'is-range-end', 'is-start-date', 'is-end-date', 'is-single-date');
             if (customClass) { dayCell.classList.remove(customClass); }
 
-            if (dayDate.getTime() === this.today.getTime()) { btn.setAttribute('aria-current', 'date'); }
+            // 오늘 날짜
+            if (dayDate.getTime() === this.today.getTime()) { 
+                btn.setAttribute('aria-current', 'date'); 
+            }
 
             if (this.isSingleMode) {
                 if (this.startDate === dayDateStr) { 
-                    dayCell.classList.add('is-single-date'); btn.setAttribute('aria-selected', 'true');
+                    dayCell.classList.add('is-single-date'); 
+                    btn.setAttribute('aria-selected', 'true');
                 }
             } else {
+                // RANGE 모드
                 if (start && end) {
                     if (dayDate > start && dayDate < end) { 
                         dayCell.classList.add('is-in-range'); 
@@ -349,20 +403,21 @@
                     }
                 }
                 if (dayDateStr === this.startDate) { 
-                    dayCell.classList.add('is-start-date'); btn.setAttribute('aria-selected', 'true'); 
+                    dayCell.classList.add('is-start-date'); 
+                    btn.setAttribute('aria-selected', 'true'); 
                     if (end) { dayCell.classList.add('is-range-start'); } 
                 } 
                 if (dayDateStr === this.endDate) { 
-                    dayCell.classList.add('is-end-date'); btn.setAttribute('aria-selected', 'true'); 
+                    dayCell.classList.add('is-end-date'); 
+                    btn.setAttribute('aria-selected', 'true'); 
                     if (start) { dayCell.classList.add('is-range-end'); }
                 }
             }
         } 
 
-        // 2. 경계 마커 업데이트
-        var markerTds = (this.cachedMarkerTds && this.cachedMarkerTds.length > 0) ? this.cachedMarkerTds : this.element.querySelectorAll('[data-marker-type]');
-        for (var k = 0; k < markerTds.length; k++) {
-            var markerTd = markerTds[k];
+        // 2. 월 경계 마커 업데이트
+        for (var k = 0; k < this.cachedMarkerTds.length; k++) {
+            var markerTd = this.cachedMarkerTds[k];
             var type = markerTd.dataset.markerType; 
             var refDate = this._parseDate(markerTd.dataset.refDate);
             
@@ -381,24 +436,108 @@
             }
         }
         
-        // [복구됨] 인풋 값 업데이트
         this._updateSelectorDisplays();
         this._dispatchChangeEvent();
     };
 
+    /**
+     * Input 값 업데이트 (동기화)
+     */
     CalendarLib.prototype._updateSelectorDisplays = function() {
-        var fmt = this.options.format; var sLab = this.options.defaultStartLabel; var eLab = this.options.defaultEndLabel;
-        var setVal = function(el, val, defaultText) {
+        var fmt = this.options.format; 
+        var sLab = this.options.defaultStartLabel; 
+        var eLab = this.options.defaultEndLabel;
+        
+        var updateInput = function(el, dateStr, label) {
             if (!el) return;
-            var display = val ? this._formatDate(val, fmt) : defaultText;
-            if (el.tagName === 'INPUT') { el.value = display; } else { el.textContent = display; }
-            if (!val) el.classList.add('text-gray-400'); else el.classList.remove('text-gray-400');
+            var display = dateStr ? this._formatDate(dateStr, fmt) : label;
+            if (el.tagName === 'INPUT') { el.value = display; } 
+            else { el.textContent = display; }
         }.bind(this);
-        setVal(this.els.startInput, this.startDate, (this.isSingleMode ? '날짜 선택' : sLab));
-        if (!this.isSingleMode) { setVal(this.els.endInput, this.endDate, eLab); }
+        
+        if (this.els.startInput) { 
+            updateInput(this.els.startInput, this.startDate, (this.isSingleMode ? '날짜 선택' : sLab)); 
+        }
+        if (this.els.endInput && !this.isSingleMode) { 
+            updateInput(this.els.endInput, this.endDate, eLab); 
+        }
+    };
+    
+    /**
+     * HTML 생성 메서드
+     */
+    CalendarLib.prototype._generateCalendarHTML = function(year, month) {
+        var monthIndex = month - 1; 
+        var firstDay = new Date(year, monthIndex, 1);
+        var daysInMonth = new Date(year, month, 0).getDate();
+        var startDayOfWeek = firstDay.getDay(); 
+        
+        var monthTitle = this.options.monthHeaderFormat
+            .replace('YYYY', year)
+            .replace('M', month)
+            .replace('MM', (month < 10 ? '0'+month : month));
+
+        var html = '<div class="month-grid">' + 
+            '<h3 id="month-'+year+'-'+month+'">' + monthTitle + '</h3>' +
+            '<table role="grid" aria-labelledby="month-'+year+'-'+month+'">' +
+                '<thead><tr>';
+        
+        for (var d = 0; d < 7; d++) {
+            var thClass = (d === 0) ? 'is-sun' : '';
+            html += '<th scope="col" class="' + thClass + '">' + this.options.dayNames[d] + '</th>';
+        }
+        html += '</tr></thead><tbody>';
+            
+        var dayCounter = 1; 
+        var paddingStarted = false;
+        
+        // 마커용 날짜
+        var firstDayOfCurrentMonth = new Date(year, monthIndex, 1); firstDayOfCurrentMonth.setHours(0,0,0,0);
+        var lastDayOfCurrentMonth = new Date(year, monthIndex, daysInMonth); lastDayOfCurrentMonth.setHours(0,0,0,0);
+        var firstDayISO = this._dateToISO(firstDayOfCurrentMonth);
+        var lastDayISO = this._dateToISO(lastDayOfCurrentMonth);
+
+        for (var i = 0; i < 6; i++) {
+            html += '<tr>';
+            for (var j = 0; j < 7; j++) {
+                var tdClasses = ''; var classes = 'day-btn'; var extraLabel = ''; var ariaLabel = '';
+                var markerAttr = '';
+
+                if (i === 0 && j < startDayOfWeek) { 
+                    if (j === startDayOfWeek - 1) { markerAttr = 'data-marker-type="prev" data-ref-date="' + firstDayISO + '"'; }
+                    html += '<td class="' + tdClasses + '" ' + markerAttr + '><span aria-hidden="true"></span></td>'; continue;
+                } else if (dayCounter > daysInMonth) {
+                    if (!paddingStarted) { markerAttr = 'data-marker-type="next" data-ref-date="' + lastDayISO + '"'; paddingStarted = true; }
+                    html += '<td class="' + tdClasses + '" ' + markerAttr + '><span aria-hidden="true"></span></td>'; dayCounter++; continue;
+                } else {
+                    var dateObj = new Date(year, monthIndex, dayCounter); dateObj.setHours(0,0,0,0);
+                    var fullDateStr = this._dateToISO(dateObj);
+                    
+                    ariaLabel = year + '년 ' + month + '월 ' + dayCounter + '일';
+
+                    if (j === 0) classes += ' is-sun';
+                    if (dateObj.getTime() === this.today.getTime()) { 
+                        classes += ' is-today'; 
+                        extraLabel = '<span class="today-label" aria-hidden="true">오늘</span>';
+                        ariaLabel += ', 오늘';
+                    }
+                    
+                    var isDisabled = this._isDateDisabled(dateObj, fullDateStr);
+                    var disabledAttr = isDisabled ? 'disabled aria-disabled="true"' : '';
+                    if (isDisabled) { tdClasses += ' is-disabled'; classes += ' is-disabled'; }
+                    
+                    html += '<td class="' + tdClasses + '"><button type="button" class="' + classes + '" data-date="' + fullDateStr + '" aria-label="' + ariaLabel + '" ' + disabledAttr + '>' + dayCounter + extraLabel + '</button></td>';
+                    dayCounter++;
+                }
+            }
+            html += '</tr>';
+            if (dayCounter > daysInMonth) break; 
+        }
+        html += '</tbody></table></div>';
+        return html;
     };
 
-    // --- Helpers ---
+    // --- Helper Methods ---
     CalendarLib.prototype.getValue = function() { return { startDate: this.startDate, endDate: this.endDate }; };
     CalendarLib.prototype._dispatchChangeEvent = function() {
         var event; var params = { detail: this.getValue(), bubbles: true, cancelable: true };
@@ -412,8 +551,8 @@
     };
     CalendarLib.prototype._formatDate = function(dateString, formatString) {
         if (!dateString || !formatString) return null; var date = this._parseDate(dateString); if (!date) return null;
-        var y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate(), day = ['일','월','화','수','목','금','토'][date.getDay()];
-        var tokens = { YYYY: y, MM: m<10?'0'+m:m, M: m, DD: d<10?'0'+d:d, D: d, ddd: day };
+        var y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate(), dayIdx = date.getDay();
+        var tokens = { YYYY: y, MM: m<10?'0'+m:m, M: m, DD: d<10?'0'+d:d, D: d, ddd: this.options.dayNames[dayIdx] };
         return formatString.replace(/YYYY|MM|M|DD|D|ddd/g, function(x) { return tokens[x] || x; });
     };
     CalendarLib.prototype._parseDate = function(str) { 
@@ -427,7 +566,7 @@
     CalendarLib.prototype._buildSwipeStructure = function(startYear, startMonth) {
         var current = new Date(startYear, startMonth - 1, 1); this.monthData = [];
         for (var i = 0; i < this.options.numberOfMonths; i++) { this.monthData.push({ year: current.getFullYear(), month: current.getMonth() + 1 }); current.setMonth(current.getMonth() + 1); }
-        var navHtml = '<div class="calendar-header flex items-center justify-between p-2 mb-2"><button class="nav-prev p-2 text-xl font-bold" aria-label="이전 달">&lt;</button><h3 class="month-title font-bold text-lg" aria-live="polite"></h3><button class="nav-next p-2 text-xl font-bold" aria-label="다음 달">&gt;</button></div>';
+        var navHtml = '<div class="calendar-header"><button class="nav-prev nav-btn" aria-label="이전 달">&lt;</button><h3 class="month-title" aria-live="polite"></h3><button class="nav-next nav-btn" aria-label="다음 달">&gt;</button></div>';
         this.element.innerHTML += navHtml;
         var viewport = document.createElement('div'); viewport.className = 'calendar-viewport overflow-hidden relative';
         var slider = document.createElement('div'); slider.className = 'calendar-slider flex';
@@ -457,17 +596,20 @@
     };
     CalendarLib.prototype._animateSwipe = function() { this.element.querySelector('.calendar-slider').style.transform = 'translateX(' + (-100 * this.currentMonthIndex) + '%)'; };
     CalendarLib.prototype._updateNavigationTitle = function() {
-        var m = this.monthData[this.currentMonthIndex]; this.element.querySelector('.month-title').textContent = m.year + '년 ' + m.month + '월';
+        var m = this.monthData[this.currentMonthIndex]; 
+        // 헤더 포맷 적용
+        var title = this.options.monthHeaderFormat.replace('YYYY', m.year).replace('M', m.month).replace('MM', (m.month<10?'0'+m.month:m.month));
+        this.element.querySelector('.month-title').textContent = title;
         var p = this.element.querySelector('.nav-prev'), n = this.element.querySelector('.nav-next');
         p.disabled = this.currentMonthIndex===0; n.disabled = this.currentMonthIndex===this.monthData.length-1; p.style.opacity = p.disabled?.5:1; n.style.opacity = n.disabled?.5:1;
     };
-
 
     // ============================================
     //  ⬇️ 실행 코드 ⬇️
     // ============================================
     
     var myCalendar;
+
     document.addEventListener('DOMContentLoaded', function() {
         myCalendar = new CalendarLib(document.getElementById('calendar-root'), {
             selectionMode: 'RANGE', 
@@ -475,143 +617,12 @@
             endDateSelector: '#end-date-input',
             format: 'YYYY.MM.DD(ddd)',
             swipeNavigation: false,
-            minDate: '2025.11.28' // 과거 선택 허용
+            minDate: null, // 과거 날짜 허용
+
+            onSelect: function(val) { console.log('Select:', val); }
         });
-
-		var date = myCalendar.getValue();
-
-		console.log(date.startDate, date.endDate);
     });
 
-
 </script>
-<!--
-var myCalendar = new CalendarLib(document.getElementById('calendar-wrapper'), {
-    
-    // --- [1] 기본 모드 설정 ---
-    
-    /** * 선택 모드: 'RANGE' (기간 선택) 또는 'SINGLE' (하루 선택)
-     * 기본값: 'RANGE' 
-     */
-    selectionMode: 'RANGE',
-
-    /** * 탐색 방식: true (좌우 화살표 스와이프), false (세로 스크롤)
-     * 기본값: false
-     */
-    swipeNavigation: false,
-
-    /** * 한 번에 보여줄 개월 수
-     * 값을 안 쓰면(undefined) minDate ~ maxDate 또는 Input 기간에 맞춰 자동 계산됨
-     * 기본값: 2 (옵션 없고, 날짜 제한도 없을 때)
-     */
-    numberOfMonths: 2,
-
-
-    // --- [2] Input 및 표시 포맷 연결 ---
-
-    /** 시작일이 표시될 태그의 ID (#) 또는 클래스 (.) */
-    startDateSelector: '#start-input',
-
-    /** 종료일이 표시될 태그의 ID ('RANGE' 모드일 때만 사용) */
-    endDateSelector: '#end-input',
-
-    /** * 날짜 표시 형식
-     * YYYY(년), MM(01~12), M(1~12), DD(01~31), D(1~31), ddd(요일)
-     * 기본값: 'YYYY.MM.DD(ddd)'
-     */
-    format: 'YYYY년 M월 D일 (ddd)',
-
-    /** 시작일이 없을 때 인풋에 보여줄 기본 텍스트 */
-    defaultStartLabel: '체크인',
-
-    /** 종료일이 없을 때 인풋에 보여줄 기본 텍스트 */
-    defaultEndLabel: '체크아웃',
-
-
-    // --- [3] 날짜 제한 (Constraints) ---
-
-    /** * 선택 가능한 최소 날짜
-     * 값: 'today' (오늘부터), '2025-11-01' (특정일), null (제한 없음)
-     * 기본값: 'today'
-     */
-    minDate: 'today',
-
-    /** * 선택 가능한 최대 날짜
-     * 값: '2026-12-31' (특정일), null (제한 없음)
-     */
-    maxDate: '2026-06-30',
-
-    /** * 오늘(혹은 minDate)을 기준으로 선택 가능한 최대 기간(일수)
-     * 예: 90 (오늘부터 90일 뒤까지만 선택 가능)
-     * 설정 시 maxDate보다 우선순위가 높거나 더 좁은 범위가 적용됨
-     */
-    selectableDays: 90,
-
-    /** * 특정 날짜 비활성화 (Blacklist) - 휴무일 등
-     * 배열 안에 'YYYY-MM-DD' 형식으로 입력
-     */
-    disable: ['2025-12-25', '2026-01-01'],
-
-    /** * 특정 날짜만 활성화 (Whitelist) - 예약 가능일 등
-     * 이 값이 있으면 disable은 무시됨
-     */
-    // enable: ['2025-12-10', '2025-12-11'], 
-
-
-    // --- [4] 초기 값 설정 (Initial Values) ---
-    
-    /** * 초기 시작일/종료일 강제 설정
-     * (HTML Input의 value보다 우선순위가 높음)
-     */
-    startDate: '2025-12-24',
-    endDate: '2025-12-26',
-
-
-    // --- [5] 스타일링 ---
-
-    /** * 선택된 기간의 배경(td)에 추가할 사용자 정의 CSS 클래스
-     * (CSS 파일에 .my-custom-gradient { ... } 정의 필요)
-     */
-    rangeClass: 'my-custom-gradient',
-
-
-    // --- [6] 이벤트 콜백 (Callbacks) ---
-
-    /** 날짜 선택이 완료되었을 때 (클릭 시) */
-    onSelect: function(value) {
-        console.log('선택됨:', value.startDate, '~', value.endDate);
-    },
-
-    /** * 달력이 그려질 때 각 날짜 셀(td/button) 커스텀
-     * 예: 가격 표시, 아이콘 추가
-     */
-    onRenderCell: function(date, cellElement) {
-        // 1일마다 빨간 점 찍기 예시
-        if (date.getDate() === 1) {
-            cellElement.style.border = '1px solid red';
-        }
-    },
-
-    /** 스와이프 모드에서 달력 페이지가 변경됐을 때 */
-    onMonthChange: function(year, month) {
-        console.log('현재 보고 있는 달:', year, month);
-    },
-
-    /** 비활성화된 날짜를 클릭했을 때 경고 */
-    onInvalid: function(dateStr) {
-        alert(dateStr + "은 선택할 수 없습니다.");
-    },
-
-    /** 초기화가 완료되었을 때 */
-    onInit: function(instance) {
-        console.log('캘린더 로딩 완료');
-    },
-
-    /** destroy() 호출 시 */
-    onDestroy: function() {
-        console.log('캘린더 삭제됨');
-    }
-});
--->
 </body>
 </html>
